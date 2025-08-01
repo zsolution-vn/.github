@@ -1,28 +1,128 @@
-name: ✨ Feature Request
-description: Đề xuất tính năng hoặc cải tiến mới
-title: "[Feature]: "
-labels: [enhancement]
-assignees: []
+# .github/ISSUE_TEMPLATE/yeu_cau_tinh_nang.yml
+name: 🚀 Feature Request (Phân công Owner)
+description: Đề xuất tính năng mới với phân công chủ sở hữu rõ ràng
+title: "[FEATURE] "
+labels: ["enhancement", "needs-owner", "new-feature"]
+projects: ["Team Ownership Board"]
 
 body:
-  - type: textarea
-    id: summary
+  - type: markdown
     attributes:
-      label: Mô tả yêu cầu
-      description: Mô tả mục tiêu và ngữ cảnh sử dụng
-      placeholder: "Người dùng muốn xem báo cáo doanh thu theo ngày..."
+      value: |
+        ## 🎯 Feature Ownership Process
+        Tính năng này cần một **Owner** đảm nhận trách nhiệm từ đầu đến cuối:
+        - 🎨 Design & Development
+        - 🧪 Testing & Quality Assurance  
+        - 🚀 Deployment & Monitoring
+        - 📚 Documentation & Support
+
+  - type: input
+    id: feature_owner
+    attributes:
+      label: "🧑‍💼 Đề xuất Feature Owner"
+      description: "Ai sẽ làm chủ sở hữu tính năng này?"
+      placeholder: "@username hoặc 'needs-assignment'"
+    validations:
+      required: false
 
   - type: textarea
-    id: benefit
+    id: business_context
     attributes:
-      label: Lý do / giá trị mang lại
-      placeholder: "Giúp sale nắm nhanh hiệu suất làm việc hàng ngày"
-
-  - type: textarea
-    id: acceptance
-    attributes:
-      label: Điều kiện hoàn thành (Acceptance Criteria)
+      label: "💼 Business Context"
+      description: "Tại sao tính năng này quan trọng? Giải quyết vấn đề gì?"
       placeholder: |
-        - Hiển thị biểu đồ đường
-        - Có filter theo ngày
-        - Dữ liệu realtime
+        - Customer impact: 
+        - Business value:
+        - Success metrics:
+    validations:
+      required: true
+
+  - type: textarea
+    id: user_story
+    attributes:
+      label: "📖 User Story"
+      description: "Mô tả tính năng từ góc độ người dùng"
+      placeholder: |
+        As a [user type]
+        I want to [action]
+        So that [benefit/value]
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "✅ Acceptance Criteria"
+      description: "Điều kiện rõ ràng, có thể kiểm tra để xác định tính năng hoàn thành"
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "⚡ Priority Level"
+      description: "Tính năng này gấp đến mức nào?"
+      options:
+        - "🔥 Critical (Tuần này)"
+        - "⚡ High (Sprint này)"
+        - "📋 Medium (Sprint tới)"
+        - "🔮 Low (Backlog)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: "🧩 Story Points/Complexity"
+      description: "Đánh giá độ phức tạp ban đầu"
+      options:
+        - "🟢 Simple (1-3 days)"
+        - "🟡 Medium (1 week)"
+        - "🟠 Complex (1-2 weeks)"
+        - "🔴 Epic (2+ weeks)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_considerations
+    attributes:
+      label: "⚙️ Technical Requirements"
+      description: "Yêu cầu kỹ thuật, constraints hoặc dependencies"
+      placeholder: |
+        - Dependencies:
+        - Technical constraints:
+        - Architecture impact:
+        - Security considerations:
+
+  - type: textarea
+    id: definition_of_done
+    attributes:
+      label: "🏁 Definition of Done"
+      description: "Checklist để hoàn thành tính năng"
+      value: |
+        - [ ] Code implemented và reviewed
+        - [ ] Unit tests written (>80% coverage)
+        - [ ] Integration tests passing
+        - [ ] Documentation updated
+        - [ ] Security review completed
+        - [ ] Performance testing done
+        - [ ] Deployed to staging
+        - [ ] User acceptance testing
+        - [ ] Monitoring/alerting configured
+        - [ ] Runbook created
+        - [ ] Knowledge transfer completed
+
+  - type: checkboxes
+    id: ownership_agreement
+    attributes:
+      label: "🤝 Ownership Agreement"
+      description: "Bằng việc nhận ownership, tôi đồng ý:"
+      options:
+        - label: "Đảm nhận end-to-end responsibility cho feature này"
+        - label: "Sẵn sàng on-call support sau khi deploy"
+        - label: "Maintain documentation và knowledge sharing"
+        - label: "Monitor feature performance và user feedback"

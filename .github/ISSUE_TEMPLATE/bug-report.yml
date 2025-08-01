@@ -1,46 +1,114 @@
-name: 🐞 Bug Report
-description: Báo cáo lỗi hoặc hành vi không đúng
-title: "[Bug]: "
-labels: [bug, needs-triage]
-assignees: []
+# .github/ISSUE_TEMPLATE/bug_report.yml
+name: 🐛 Bug Report (Phân công Owner)
+description: Báo cáo lỗi với phân công chủ sở hữu rõ ràng
+title: "[BUG] "
+labels: ["bug", "needs-triage", "needs-investigation"]
 
 body:
-  - type: textarea
-    id: describe
+  - type: markdown
     attributes:
-      label: Mô tả lỗi
-      description: Hãy mô tả rõ ràng điều gì đang xảy ra sai.
-      placeholder: "Khi tôi nhấn nút Lưu, không có gì xảy ra..."
+      value: |
+        ## 🔍 Bug Ownership Process
+        Bug sẽ được assigned cho **Feature Owner** hoặc team member liên quan để investigate và resolve.
+
+  - type: input
+    id: affected_feature
+    attributes:
+      label: "🎯 Affected Feature/Component"
+      description: "Feature hoặc component nào bị ảnh hưởng?"
+      placeholder: "VD: User Authentication, Payment Gateway..."
     validations:
       required: true
 
-  - type: textarea
-    id: steps
+  - type: input
+    id: current_owner
     attributes:
-      label: Các bước để tái hiện lỗi
-      description: Nêu chi tiết các bước để gặp lỗi
-      placeholder: |
-        1. Mở trang X
-        2. Nhấn nút Y
-        3. Quan sát hành vi sai
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: Kết quả mong đợi
-      placeholder: "Nút Lưu phải hiển thị thông báo 'Đã lưu thành công'"
-    validations:
-      required: false
+      label: "👤 Current Feature Owner"
+      description: "Ai owns feature này? (@mention nếu biết)"
+      placeholder: "@username hoặc 'unknown'"
 
   - type: dropdown
     id: severity
     attributes:
-      label: Mức độ nghiêm trọng
+      label: "🚨 Severity Level"
+      description: "Bug này nghiêm trọng đến mức nào?"
       options:
-        - Low
-        - Medium
-        - High
-        - Critical
-      default: 1
+        - "🔥 Critical - System Down"
+        - "⚡ High - Core Feature Broken"
+        - "🟡 Medium - Feature Degraded"
+        - "🟢 Low - Minor Issue"
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: "📝 Bug Description"
+      description: "Mô tả rõ ràng về vấn đề gì đã xảy ra"
+      placeholder: "Describe what happened..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: "🔄 Steps to Reproduce"
+      description: "Các bước chi tiết để reproduce issue"
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: "✅ Expected Behavior"
+      description: "Điều gì lẽ ra phải xảy ra?"
+      placeholder: "Describe the expected behavior..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: "❌ Actual Behavior"
+      description: "Điều gì thực sự đã xảy ra?"
+      placeholder: "Describe the actual behavior..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "🌍 Environment"
+      description: "Chi tiết môi trường"
+      value: |
+        - OS: 
+        - Browser: 
+        - Version: 
+        - Environment: [Development/Staging/Production]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs_screenshots
+    attributes:
+      label: "📋 Logs/Screenshots"
+      description: "Logs, error messages hoặc screenshots liên quan"
+      placeholder: "Paste logs hoặc drag screenshots here..."
+
+  - type: textarea
+    id: investigation_plan
+    attributes:
+      label: "🔍 Investigation Plan"
+      description: "Cho assigned owner: Bạn sẽ investigate như thế nào?"
+      placeholder: |
+        - [ ] Check application logs
+        - [ ] Review recent deployments
+        - [ ] Verify database state
+        - [ ] Test in different environments
+        - [ ] Check monitoring dashboards
+        - [ ] Contact related teams (if needed)
