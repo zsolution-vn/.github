@@ -52,6 +52,13 @@ on:
   pull_request_review:
     types: [submitted]
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+
 jobs:
   claude:
     uses: zsolution-vn/.github/.github/workflows/claude-reusable.yml@main
@@ -64,6 +71,13 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
 
 jobs:
   claude-review:
