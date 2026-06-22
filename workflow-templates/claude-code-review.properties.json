@@ -1,0 +1,6 @@
+{
+  "name": "Claude Code Review (tự động review PR)",
+  "description": "Tự động review mọi PR (code, bảo mật, hiệu năng, test). Gọi reusable workflow của org zsolution-vn.",
+  "iconName": "octicon code-review",
+  "categories": ["Automation", "Code review"]
+}

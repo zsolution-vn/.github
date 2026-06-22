@@ -1,0 +1,56 @@
+name: Claude Code Review (reusable)
+
+# Reusable workflow: tự động review PR.
+# Các repo trong org gọi workflow này qua `uses:` + `secrets: inherit`.
+on:
+  workflow_call:
+    inputs:
+      model:
+        description: "Model Claude sử dụng"
+        type: string
+        required: false
+        default: "claude-opus-4-8"
+    secrets:
+      ANTHROPIC_API_KEY:
+        description: "API key cho endpoint Anthropic-compatible"
+        required: true
+      ANTHROPIC_BASE_URL:
+        description: "Endpoint tùy chỉnh (Anthropic-compatible)"
+        required: true
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read # Cho phép Claude đọc kết quả CI trên PR
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Hãy review pull request này và để lại nhận xét trực tiếp lên các dòng code.
+            Tập trung vào:
+            - Chất lượng code và tính dễ đọc
+            - Lỗi tiềm ẩn và edge case chưa xử lý
+            - Vấn đề bảo mật (input chưa validate, secret hardcode, injection, XSS...)
+            - Hiệu năng (N+1 query, vòng lặp tốn kém, thiếu phân trang)
+            - Độ bao phủ test cho phần thay đổi
+
+            Dùng `gh pr comment` để tóm tắt và `gh api` để comment theo từng dòng.
+            Mang tính xây dựng, ưu tiên các vấn đề CRITICAL/HIGH. Viết bằng tiếng Việt.
+          claude_args: |
+            --model ${{ inputs.model }}
+            --allowed-tools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api:*)"

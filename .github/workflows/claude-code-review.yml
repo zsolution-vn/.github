@@ -1,0 +1,13 @@
+name: Claude Code Review
+
+# Caller: gọi reusable workflow review PR của org cho chính repo .github này.
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    uses: zsolution-vn/.github/.github/workflows/claude-review-reusable.yml@main
+    secrets: inherit
+    # with:
+    #   model: claude-opus-4-8

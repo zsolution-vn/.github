@@ -1,0 +1,6 @@
+{
+  "name": "Claude Code (@claude)",
+  "description": "Phản hồi khi được tag @claude trong issue, comment, PR. Gọi reusable workflow của org zsolution-vn.",
+  "iconName": "octicon hubot",
+  "categories": ["Automation", "Code review"]
+}

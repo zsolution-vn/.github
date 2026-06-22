@@ -1,0 +1,50 @@
+name: Claude Code (reusable)
+
+# Reusable workflow: phản hồi khi được tag @claude.
+# Các repo trong org gọi workflow này qua `uses:` + `secrets: inherit`.
+# KHÔNG đặt trigger ở đây — trigger nằm ở caller workflow của từng repo.
+on:
+  workflow_call:
+    inputs:
+      model:
+        description: "Model Claude sử dụng"
+        type: string
+        required: false
+        default: "claude-opus-4-8"
+    secrets:
+      ANTHROPIC_API_KEY:
+        description: "API key cho endpoint Anthropic-compatible"
+        required: true
+      ANTHROPIC_BASE_URL:
+        description: "Endpoint tùy chỉnh (Anthropic-compatible)"
+        required: true
+
+jobs:
+  claude:
+    # Chỉ chạy khi nội dung có chứa "@claude"
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read # Cho phép Claude đọc kết quả CI trên PR
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: "--model ${{ inputs.model }}"
