@@ -22,6 +22,9 @@
 #   # TẤT CẢ private repo trong org:
 #   ./setup-claude.sh --all-private
 #
+#   # Theo danh sách trong file (mỗi dòng 1 owner/repo, bỏ qua dòng trống / bắt đầu bằng #):
+#   ./setup-claude.sh --from-file scripts/claude-target-repos.txt
+#
 set -euo pipefail
 
 ORG="zsolution-vn"
@@ -108,16 +111,35 @@ if [ "${1:-}" = "--all-private" ]; then
   while IFS= read -r r; do REPOS+=("$r"); done < <(
     gh repo list "$ORG" --visibility private --limit 500 --json nameWithOwner -q '.[].nameWithOwner'
   )
+elif [ "${1:-}" = "--from-file" ]; then
+  file="${2:?✗ Thiếu đường dẫn file sau --from-file}"
+  [ -f "$file" ] || { echo "✗ Không thấy file: $file" >&2; exit 1; }
+  while IFS= read -r r; do
+    r="${r%%#*}"; r="$(echo "$r" | xargs)"   # bỏ comment + trim
+    [ -n "$r" ] && REPOS+=("$r")
+  done < "$file"
 elif [ "$#" -ge 1 ]; then
   REPOS=("$@")
 else
-  echo "Cách dùng: $0 <owner/repo> [owner/repo ...]   |   $0 --all-private" >&2
+  echo "Cách dùng:" >&2
+  echo "  $0 <owner/repo> [owner/repo ...]" >&2
+  echo "  $0 --all-private" >&2
+  echo "  $0 --from-file <path>" >&2
   exit 1
 fi
 
 [ "${#REPOS[@]}" -eq 0 ] && { echo "✗ Không có repo nào để xử lý." >&2; exit 1; }
 
-echo "→ Sẽ onboard ${#REPOS[@]} repo."
+echo "→ Sẽ onboard ${#REPOS[@]} repo (set 2 secret + commit 2 file caller vào mỗi repo)."
+if [ "${ASSUME_YES:-}" != "1" ]; then
+  printf "   Xác nhận tiếp tục? [y/N] "
+  read -r ans
+  case "$ans" in
+    y|Y|yes|YES) ;;
+    *) echo "Đã hủy."; exit 0 ;;
+  esac
+fi
+
 for repo in "${REPOS[@]}"; do
   setup_repo "$repo"
 done
