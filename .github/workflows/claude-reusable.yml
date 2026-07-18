@@ -62,9 +62,10 @@ jobs:
           from pathlib import Path
 
           Path(sys.argv[1]).write_text(
-              '''#!/usr/bin/env python3
+          '''#!/usr/bin/env python3
           import sys
           import zipfile
+          from pathlib import Path
 
           args = sys.argv[1:]
           archive = None
@@ -91,7 +92,13 @@ jobs:
               raise SystemExit("usage: unzip [-oq] archive [-d destination]")
 
           with zipfile.ZipFile(archive) as bundle:
-              bundle.extractall(destination, members or None)
+              selected = bundle.infolist() if not members else [bundle.getinfo(name) for name in members]
+              bundle.extractall(destination, selected)
+
+              for member in selected:
+                  mode = (member.external_attr >> 16) & 0o777
+                  if mode and not member.is_dir():
+                      (Path(destination) / member.filename).chmod(mode)
           ''',
               encoding="utf-8",
           )
