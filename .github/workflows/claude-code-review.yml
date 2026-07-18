@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   claude-review:
-    uses: zsolution-vn/.github/.github/workflows/claude-review-reusable.yml@main
+    uses: ./.github/workflows/claude-review-reusable.yml
     secrets: inherit
     # with:
     #   model: claude-opus-4-8

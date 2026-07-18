@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   claude:
-    uses: zsolution-vn/.github/.github/workflows/claude-reusable.yml@main
+    uses: ./.github/workflows/claude-reusable.yml
     secrets: inherit
     # with:
     #   model: claude-opus-4-8
