@@ -90,8 +90,13 @@ jobs:
 
               for member in selected:
                   mode = (member.external_attr >> 16) & 0o777
-                  if mode and not member.is_dir():
-                      (Path(destination) / member.filename).chmod(mode)
+                  target = Path(destination) / member.filename
+                  if member.is_dir():
+                      continue
+                  if target.name in {"bun", "bunx", "node"}:
+                      target.chmod((mode or 0o644) | 0o111)
+                  elif mode:
+                      target.chmod(mode)
           ''',
               encoding="utf-8",
           )
