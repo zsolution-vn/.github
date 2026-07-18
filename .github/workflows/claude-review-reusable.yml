@@ -56,6 +56,7 @@ jobs:
 
           Path(sys.argv[1]).write_text(
           '''#!/usr/bin/env python3
+          import shutil
           import sys
           import zipfile
           from pathlib import Path
@@ -64,6 +65,7 @@ jobs:
           archive = None
           destination = "."
           members = []
+          junk_paths = False
           index = 0
 
           while index < len(args):
@@ -72,9 +74,11 @@ jobs:
                   index += 1
                   destination = args[index]
               elif argument.startswith("-"):
-                  unsupported = set(argument[1:]) - {"o", "q"}
+                  flags = set(argument[1:])
+                  unsupported = flags - {"j", "o", "q"}
                   if unsupported:
                       raise SystemExit(f"unsupported unzip option: {argument}")
+                  junk_paths = junk_paths or "j" in flags
               elif archive is None:
                   archive = argument
               else:
@@ -86,11 +90,21 @@ jobs:
 
           with zipfile.ZipFile(archive) as bundle:
               selected = bundle.infolist() if not members else [bundle.getinfo(name) for name in members]
-              bundle.extractall(destination, selected)
+              if junk_paths:
+                  Path(destination).mkdir(parents=True, exist_ok=True)
+                  for member in selected:
+                      if member.is_dir():
+                          continue
+                      target = Path(destination) / Path(member.filename).name
+                      with bundle.open(member) as source, target.open("wb") as output:
+                          shutil.copyfileobj(source, output)
+              else:
+                  bundle.extractall(destination, selected)
 
               for member in selected:
                   mode = (member.external_attr >> 16) & 0o777
-                  target = Path(destination) / member.filename
+                  relative_path = Path(member.filename).name if junk_paths else member.filename
+                  target = Path(destination) / relative_path
                   if member.is_dir():
                       continue
                   if target.name in {"bun", "bunx", "node"}:
