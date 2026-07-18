@@ -20,7 +20,9 @@ on:
 
 jobs:
   claude-review:
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'zsolution-vn'
+    runs-on: self-hosted
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: write
@@ -28,10 +30,24 @@ jobs:
       id-token: write
       actions: read # Cho phép Claude đọc kết quả CI trên PR
     steps:
+      - name: Validate self-hosted runner
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ "$(uname -s)" == "Linux" ]]
+          [[ "$(uname -m)" == "x86_64" ]]
+
+          available_kb="$(df -Pk "${RUNNER_TEMP}" | awk 'NR == 2 { print $4 }')"
+          required_kb="$((2 * 1024 * 1024))"
+          (( available_kb >= required_kb ))
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          clean: true
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Run Claude Code Review
         id: claude-review

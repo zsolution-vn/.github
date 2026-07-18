@@ -23,11 +23,13 @@ jobs:
   claude:
     # Chỉ chạy khi nội dung có chứa "@claude"
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      github.repository_owner == 'zsolution-vn' &&
+      ((github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    runs-on: ubuntu-latest
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))))
+    runs-on: self-hosted
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
@@ -35,9 +37,22 @@ jobs:
       id-token: write
       actions: read # Cho phép Claude đọc kết quả CI trên PR
     steps:
+      - name: Validate self-hosted runner
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          [[ "$(uname -s)" == "Linux" ]]
+          [[ "$(uname -m)" == "x86_64" ]]
+
+          available_kb="$(df -Pk "${RUNNER_TEMP}" | awk 'NR == 2 { print $4 }')"
+          required_kb="$((2 * 1024 * 1024))"
+          (( available_kb >= required_kb ))
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          clean: true
           fetch-depth: 1
 
       - name: Run Claude Code
