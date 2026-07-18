@@ -37,10 +37,60 @@ jobs:
 
           [[ "$(uname -s)" == "Linux" ]]
           [[ "$(uname -m)" == "x86_64" ]]
+          command -v python3 >/dev/null
 
           available_kb="$(df -Pk "${RUNNER_TEMP}" | awk 'NR == 2 { print $4 }')"
           required_kb="$((2 * 1024 * 1024))"
           (( available_kb >= required_kb ))
+
+      - name: Install isolated unzip shim
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          shim_dir="${RUNNER_TEMP}/zsolution-bin"
+          mkdir -p "${shim_dir}"
+          python3 - "${shim_dir}/unzip" <<'PY'
+          import sys
+          from pathlib import Path
+
+          Path(sys.argv[1]).write_text(
+              '''#!/usr/bin/env python3
+          import sys
+          import zipfile
+
+          args = sys.argv[1:]
+          archive = None
+          destination = "."
+          members = []
+          index = 0
+
+          while index < len(args):
+              argument = args[index]
+              if argument == "-d":
+                  index += 1
+                  destination = args[index]
+              elif argument.startswith("-"):
+                  unsupported = set(argument[1:]) - {"o", "q"}
+                  if unsupported:
+                      raise SystemExit(f"unsupported unzip option: {argument}")
+              elif archive is None:
+                  archive = argument
+              else:
+                  members.append(argument)
+              index += 1
+
+          if archive is None:
+              raise SystemExit("usage: unzip [-oq] archive [-d destination]")
+
+          with zipfile.ZipFile(archive) as bundle:
+              bundle.extractall(destination, members or None)
+          ''',
+              encoding="utf-8",
+          )
+          PY
+          chmod +x "${shim_dir}/unzip"
+          echo "${shim_dir}" >> "${GITHUB_PATH}"
 
       - name: Checkout repository
         uses: actions/checkout@v6
